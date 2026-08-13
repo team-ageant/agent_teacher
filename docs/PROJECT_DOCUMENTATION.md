@@ -8,7 +8,7 @@ date: "August 2026"
 
 Adaptive AI Teacher is a Python-first conversational ReAct agent for personalized learning from plain-text material. It does not enforce a predefined lesson sequence. Instead, a central `LearningSupervisor` evaluates the current student message, recent conversation, temporary learning state, prior action, and remaining LLM budget. It then selects the single most useful teaching action for that turn.
 
-The working application includes a framework-free browser interface, FastAPI server, all required course endpoints, complete LLM execution traces, temporary conversational memory, a hard 16-call LLM limit, and LLMod chat and embedding clients. Supabase persistence, Pinecone retrieval, and production Vercel deployment remain pending.
+The working application includes a framework-free browser interface, FastAPI server, all required course endpoints, complete LLM execution traces, temporary conversational memory, a hard 16-call LLM limit, LLMod clients, and Pinecone retrieval over the pre-indexed Gutenberg corpus. Supabase persistence and production Vercel deployment remain pending.
 
 # Confirmed product decisions
 

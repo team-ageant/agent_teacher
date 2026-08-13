@@ -15,6 +15,7 @@ from .models import (
     TraceStep,
 )
 from .prompts import supervisor_prompt, tool_prompt
+from .retrieval import retrieve_passages
 
 
 def _string_array(value: Any) -> list[str]:
@@ -83,9 +84,10 @@ async def execute_agent(state: LearningState, message: str) -> tuple[str, list[d
         return response, []
 
     state.history.append(ChatTurn(role="student", content=message))
+    retrieved_passages = await retrieve_passages(message)
     calls_after_supervisor = MAX_LLM_CALLS - state.llm_calls - 1
     supervisor_system, supervisor_user = supervisor_prompt(
-        state, message, max(0, calls_after_supervisor)
+        state, message, max(0, calls_after_supervisor), retrieved_passages
     )
     # Reserve each call before dispatch. Even a timeout or invalid provider
     # response consumed an attempted request from the assignment budget.
@@ -115,7 +117,11 @@ async def execute_agent(state: LearningState, message: str) -> tuple[str, list[d
             state.last_action = "Stop"
         else:
             tool_system, tool_user = tool_prompt(
-                decision.action, state, message, decision.tool_instruction
+                decision.action,
+                state,
+                message,
+                decision.tool_instruction,
+                retrieved_passages,
             )
             state.llm_calls += 1
             tool_result = await call_llm(

@@ -13,6 +13,7 @@ Implemented:
 - temporary one-hour in-memory learning state;
 - hard limit of 16 total LLM calls per session;
 - LLMod chat and embedding clients;
+- Pinecone retrieval over the pre-indexed Gutenberg corpus;
 - deterministic, non-billable local demo mode;
 - all four course-required endpoints and the optional reset endpoint;
 - Python 3.12 test suite; and
@@ -22,7 +23,7 @@ Still pending:
 
 
 - Supabase database connection;
-- Pinecone vector index, chunking, upsert, retrieval, and deletion;
+- deletion of temporary session-specific Pinecone data (the Gutenberg corpus is persistent);
 - final team email and batch/order metadata;
 - Vercel environment configuration and production deployment.
 
@@ -50,6 +51,7 @@ adaptive_teacher/
   api_info.py                  Course metadata endpoint payloads
   config.py                    Environment-backed server configuration
   llm.py                       LLMod chat and embedding clients
+  retrieval.py                 Pinecone Gutenberg semantic retrieval
   models.py                    State, trace, tool, and budget types
   prompts.py                   Supervisor and teaching-tool prompts
   state.py                     Temporary session store
@@ -84,6 +86,10 @@ TEAM_NAME=Adaptive AI Teacher
 BATEL_EMAIL=
 ITAY_EMAIL=
 BOAZ_EMAIL=
+PINECONE_API_KEY=
+PINECONE_INDEX_HOST=https://your-index-host
+PINECONE_NAMESPACE=__default__
+PINECONE_TOP_K=5
 ```
 
 If `LLMOD_API_KEY` is missing during local development, the application uses deterministic demo responses. Tests explicitly enable demo mode so they never consume the course budget. Production fails closed when the key is missing, preventing an incorrectly configured deployment from silently serving mock lessons.
@@ -160,6 +166,14 @@ Deletes the current temporary state and clears the session cookie.
 - Verified embedding dimension: 1,536
 
 The API key remains server-side and is never included in `public/` or sent to the browser.
+
+## Pinecone retrieval
+
+Each student turn searches the pre-indexed Gutenberg corpus and supplies up to five relevant
+passages to both the supervisor and the selected teaching tool. The index uses integrated
+embedding, so queries are sent as text and LLMod embeddings are not used for this search.
+If Pinecone is not configured or is temporarily unavailable, the agent continues without
+external passages. Set `PINECONE_NAMESPACE=__default__` for Pinecone's default namespace.
 
 ## Vercel deployment
 

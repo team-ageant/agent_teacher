@@ -42,6 +42,10 @@ class Settings:
     llmod_chat_completions_url: str | None
     llmod_embeddings_url: str | None
     llmod_api_key_header: str | None
+    pinecone_api_key: str
+    pinecone_index_host: str
+    pinecone_namespace: str
+    pinecone_top_k: int
     group_batch_order_number: str
     team_name: str
     batel_email: str
@@ -73,6 +77,11 @@ def get_settings() -> Settings:
         llmod_chat_completions_url=os.getenv("LLMOD_CHAT_COMPLETIONS_URL") or None,
         llmod_embeddings_url=os.getenv("LLMOD_EMBEDDINGS_URL") or None,
         llmod_api_key_header=os.getenv("LLMOD_API_KEY_HEADER") or None,
+        pinecone_api_key=os.getenv("PINECONE_API_KEY", "").strip(),
+        pinecone_index_host=os.getenv("PINECONE_INDEX_HOST", "").strip(),
+        pinecone_namespace=os.getenv("PINECONE_NAMESPACE", "__default__").strip()
+        or "__default__",
+        pinecone_top_k=max(1, min(20, int(os.getenv("PINECONE_TOP_K", "5")))),
         group_batch_order_number=os.getenv("GROUP_BATCH_ORDER_NUMBER", "TBD_TBD").strip(),
         team_name=os.getenv("TEAM_NAME", "Adaptive AI Teacher").strip(),
         batel_email=os.getenv("BATEL_EMAIL", "").strip(),
