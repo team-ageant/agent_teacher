@@ -20,6 +20,7 @@ Implemented:
 
 Still pending:
 
+
 - Supabase database connection;
 - Pinecone vector index, chunking, upsert, retrieval, and deletion;
 - final team email and batch/order metadata;
