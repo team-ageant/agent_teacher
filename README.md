@@ -170,8 +170,8 @@ The API key remains server-side and is never included in `public/` or sent to th
 ## Pinecone retrieval
 
 Each student turn searches the pre-indexed Gutenberg corpus and supplies up to five relevant
-passages to both the supervisor and the selected teaching tool. The index uses integrated
-embedding, so queries are sent as text and LLMod embeddings are not used for this search.
+passages to both the supervisor and the selected teaching tool. Queries and document chunks
+are embedded using LLMod (`MB5R2CF-azure/text-embedding-3-small`) and stored/searched via Pinecone.
 If Pinecone is not configured or is temporarily unavailable, the agent continues without
 external passages. Set `PINECONE_NAMESPACE=__default__` for Pinecone's default namespace.
 

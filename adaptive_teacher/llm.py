@@ -84,24 +84,29 @@ async def create_embeddings(input_value: str | list[str]) -> list[list[float]]:
         raise ValueError("Embedding input must contain at least one string.")
 
     settings = get_settings()
+    dim = settings.llmod_embedding_dimensions or 1024
     if settings.demo_mode:
-        return [_mock_embedding(value) for value in values]
+        return [_mock_embedding(value, dim) for value in values]
     if not settings.llmod_api_key:
         if settings.production:
             raise RuntimeError("LLMOD_API_KEY is required in production.")
-        return [_mock_embedding(value) for value in values]
+        return [_mock_embedding(value, dim) for value in values]
+
+    payload: dict[str, Any] = {"model": settings.llmod_embedding_model, "input": values}
+    if settings.llmod_embedding_dimensions:
+        payload["dimensions"] = settings.llmod_embedding_dimensions
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             settings.embeddings_url,
             headers=_headers(settings.llmod_api_key, settings.llmod_api_key_header),
-            json={"model": settings.llmod_embedding_model, "input": values},
+            json=payload,
         )
     if not response.is_success:
         raise RuntimeError(f"LLMod embeddings request failed with HTTP {response.status_code}.")
 
-    payload = response.json()
-    data = payload.get("data") if isinstance(payload, dict) else None
+    res_payload = response.json()
+    data = res_payload.get("data") if isinstance(res_payload, dict) else None
     if not isinstance(data, list):
         raise RuntimeError("LLMod returned an invalid embeddings response.")
     ordered = sorted(
@@ -116,8 +121,8 @@ async def create_embeddings(input_value: str | list[str]) -> list[list[float]]:
     return embeddings  # type: ignore[return-value]
 
 
-def _mock_embedding(value: str) -> list[float]:
-    vector = [0.0] * 1_536
+def _mock_embedding(value: str, dimension: int = 1024) -> list[float]:
+    vector = [0.0] * dimension
     digest = hashlib.sha256(value.encode("utf-8")).digest()
     for index, byte in enumerate(value.encode("utf-8")):
         vector[(index * 31 + digest[index % len(digest)]) % len(vector)] += (byte % 97) / 97

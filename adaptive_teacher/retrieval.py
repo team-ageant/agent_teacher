@@ -12,6 +12,7 @@ except ImportError:  # Allows the application to start before optional dependenc
     Pinecone = None  # type: ignore[assignment,misc]
 
 from .config import get_settings
+from .llm import create_embeddings
 
 LOGGER = logging.getLogger(__name__)
 MAX_QUERY_CHARS = 4_000
@@ -30,40 +31,40 @@ def _as_dict(value: Any) -> dict[str, Any]:
     return {}
 
 
-def _search_sync(query: str) -> list[dict[str, Any]]:
+def _search_sync(query_vector: list[float]) -> list[dict[str, Any]]:
     settings = get_settings()
     if Pinecone is None:
         raise RuntimeError("The pinecone package is not installed.")
     index = Pinecone(api_key=settings.pinecone_api_key).Index(
         host=settings.pinecone_index_host
     )
-    response = index.search(
+    response = index.query(
         namespace=settings.pinecone_namespace,
-        query={"inputs": {"text": query[:MAX_QUERY_CHARS]}, "top_k": settings.pinecone_top_k},
-        fields=["text", "title", "authors", "gutenberg_id", "chunk_index"],
+        vector=query_vector,
+        top_k=settings.pinecone_top_k,
+        include_metadata=True,
     )
     payload = _as_dict(response)
-    result = _as_dict(payload.get("result"))
-    hits = result.get("hits", [])
-    if not isinstance(hits, list):
+    matches = payload.get("matches", [])
+    if not isinstance(matches, list):
         return []
 
     passages: list[dict[str, Any]] = []
-    for raw_hit in hits:
-        hit = _as_dict(raw_hit)
-        fields = _as_dict(hit.get("fields"))
-        text = fields.get("text")
+    for raw_match in matches:
+        match = _as_dict(raw_match)
+        metadata = _as_dict(match.get("metadata"))
+        text = metadata.get("text")
         if not isinstance(text, str) or not text.strip():
             continue
         passages.append(
             {
-                "id": str(hit.get("_id", "")),
-                "score": hit.get("_score"),
+                "id": str(match.get("id", match.get("_id", ""))),
+                "score": match.get("score", match.get("_score")),
                 "text": text.strip()[:MAX_PASSAGE_CHARS],
-                "title": fields.get("title"),
-                "authors": fields.get("authors"),
-                "gutenberg_id": fields.get("gutenberg_id"),
-                "chunk_index": fields.get("chunk_index"),
+                "title": metadata.get("title"),
+                "authors": metadata.get("authors"),
+                "gutenberg_id": metadata.get("gutenberg_id", metadata.get("id")),
+                "chunk_index": metadata.get("chunk_index"),
             }
         )
     return passages
@@ -75,7 +76,11 @@ async def retrieve_passages(query: str) -> list[dict[str, Any]]:
     if not settings.pinecone_api_key or not settings.pinecone_index_host:
         return []
     try:
-        return await asyncio.to_thread(_search_sync, query)
+        query_vectors = await create_embeddings(query[:MAX_QUERY_CHARS])
+        if not query_vectors or not query_vectors[0]:
+            return []
+        return await asyncio.to_thread(_search_sync, query_vectors[0])
     except Exception:
         LOGGER.exception("Pinecone retrieval failed; continuing without external context")
         return []
+

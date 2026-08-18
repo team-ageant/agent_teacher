@@ -28,24 +28,22 @@ def test_search_maps_pinecone_hits(monkeypatch) -> None:
     calls = {}
 
     class FakeIndex:
-        def search(self, **kwargs):
+        def query(self, **kwargs):
             calls.update(kwargs)
             return {
-                "result": {
-                    "hits": [
-                        {
-                            "_id": "3_chunk_4",
-                            "_score": 0.91,
-                            "fields": {
-                                "text": "Down the rabbit-hole",
-                                "title": "Alice's Adventures in Wonderland",
-                                "authors": ["Lewis Carroll"],
-                                "gutenberg_id": 11,
-                                "chunk_index": 4,
-                            },
-                        }
-                    ]
-                }
+                "matches": [
+                    {
+                        "id": "3_chunk_4",
+                        "score": 0.91,
+                        "metadata": {
+                            "text": "Down the rabbit-hole",
+                            "title": "Alice's Adventures in Wonderland",
+                            "authors": ["Lewis Carroll"],
+                            "gutenberg_id": 11,
+                            "chunk_index": 4,
+                        },
+                    }
+                ]
             }
 
     class FakePinecone:
@@ -56,11 +54,16 @@ def test_search_maps_pinecone_hits(monkeypatch) -> None:
             assert host == "https://test-index.example"
             return FakeIndex()
 
+    async def fake_create_embeddings(text):
+        return [[0.1, 0.2, 0.3]]
+
+    monkeypatch.setattr(retrieval_module, "create_embeddings", fake_create_embeddings)
     monkeypatch.setattr(retrieval_module, "Pinecone", FakePinecone)
     passages = asyncio.run(retrieval_module.retrieve_passages("rabbit hole"))
 
     assert calls["namespace"] == "__default__"
-    assert calls["query"]["inputs"]["text"] == "rabbit hole"
+    assert calls["vector"] == [0.1, 0.2, 0.3]
+    assert calls["include_metadata"] is True
     assert passages[0]["title"] == "Alice's Adventures in Wonderland"
     assert passages[0]["text"] == "Down the rabbit-hole"
 

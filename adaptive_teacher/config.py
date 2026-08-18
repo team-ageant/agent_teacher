@@ -39,6 +39,7 @@ class Settings:
     llmod_base_url: str
     llmod_model: str
     llmod_embedding_model: str
+    llmod_embedding_dimensions: int
     llmod_chat_completions_url: str | None
     llmod_embeddings_url: str | None
     llmod_api_key_header: str | None
@@ -66,6 +67,8 @@ class Settings:
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     environment = os.getenv("VERCEL_ENV") or os.getenv("APP_ENV") or "development"
+    raw_dim = os.getenv("LLMOD_EMBEDDING_DIMENSIONS", "1024").strip()
+    embedding_dim = int(raw_dim) if raw_dim.isdigit() else 1024
     return Settings(
         llmod_api_key=os.getenv("LLMOD_API_KEY", "").strip(),
         llmod_base_url=_normalized_base_url(os.getenv("LLMOD_BASE_URL", "https://api.llmod.ai")),
@@ -74,6 +77,7 @@ def get_settings() -> Settings:
             "LLMOD_EMBEDDING_MODEL",
             "MB5R2CF-azure/text-embedding-3-small",
         ).strip(),
+        llmod_embedding_dimensions=embedding_dim,
         llmod_chat_completions_url=os.getenv("LLMOD_CHAT_COMPLETIONS_URL") or None,
         llmod_embeddings_url=os.getenv("LLMOD_EMBEDDINGS_URL") or None,
         llmod_api_key_header=os.getenv("LLMOD_API_KEY_HEADER") or None,

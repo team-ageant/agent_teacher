@@ -23,7 +23,7 @@ def test_extract_json_accepts_plain_fenced_and_surrounded_objects() -> None:
 def test_demo_embedding_matches_production_dimension_and_is_normalized() -> None:
     vectors = asyncio.run(create_embeddings(["photosynthesis", "basketball"]))
     assert len(vectors) == 2
-    assert all(len(vector) == 1_536 for vector in vectors)
+    assert all(len(vector) == 1_024 for vector in vectors)
     assert all(math.isclose(math.sqrt(sum(v * v for v in vector)), 1.0) for vector in vectors)
 
 
