@@ -6,11 +6,14 @@ import hashlib
 import json
 import math
 import re
+import logging
 from typing import Any
 
 import httpx
 
 from .config import get_settings
+
+LOGGER = logging.getLogger(__name__)
 
 LlmMessage = dict[str, str]
 
@@ -58,12 +61,14 @@ async def call_llm(messages: list[LlmMessage]) -> dict[str, Any]:
             json={
                 "model": settings.llmod_model,
                 "messages": messages,
-                "temperature": 0.25,
+                "temperature": 1.0,
                 "response_format": {"type": "json_object"},
             },
         )
     if not response.is_success:
-        raise RuntimeError(f"LLMod request failed with HTTP {response.status_code}.")
+        error_detail = response.text[:500]
+        LOGGER.error("LLMod chat request failed with HTTP %s: %s", response.status_code, error_detail)
+        raise RuntimeError(f"LLMod request failed with HTTP {response.status_code}: {error_detail}")
 
     payload = response.json()
     choices = payload.get("choices") if isinstance(payload, dict) else None
@@ -103,7 +108,9 @@ async def create_embeddings(input_value: str | list[str]) -> list[list[float]]:
             json=payload,
         )
     if not response.is_success:
-        raise RuntimeError(f"LLMod embeddings request failed with HTTP {response.status_code}.")
+        error_detail = response.text[:500]
+        LOGGER.error("LLMod embeddings request failed with HTTP %s: %s", response.status_code, error_detail)
+        raise RuntimeError(f"LLMod embeddings request failed with HTTP {response.status_code}: {error_detail}")
 
     res_payload = response.json()
     data = res_payload.get("data") if isinstance(res_payload, dict) else None

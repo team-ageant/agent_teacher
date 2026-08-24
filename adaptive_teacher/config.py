@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# Python does not load .env.local automatically. Vercel supplies the same values
-# through its Environment Variables settings, where this local file is absent.
-load_dotenv(PROJECT_ROOT / ".env.local", override=False)
+# Load standard .env file followed by .env.local for local overrides.
+load_dotenv(PROJECT_ROOT / ".env", override=False)
+load_dotenv(PROJECT_ROOT / ".env.local", override=True)
 
 
 def _normalized_base_url(raw_url: str) -> str:
