@@ -47,7 +47,7 @@ def test_required_information_endpoints(client) -> None:
 def test_execute_has_exact_schema_trace_and_budget_headers(client) -> None:
     response = client.post(
         "/api/execute",
-        json={"prompt": "אני אוהב כדורסל. חומר הלימוד: מים קופאים באפס מעלות."},
+        json={"prompt": "I love basketball. Study material: Water freezes at zero degrees."},
     )
     assert response.status_code == 200
     payload = response.json()
@@ -72,10 +72,10 @@ def test_execute_has_exact_schema_trace_and_budget_headers(client) -> None:
 def test_session_is_continuous_and_reset_creates_a_new_id(client) -> None:
     first = client.post(
         "/api/execute",
-        json={"prompt": "אני אוהב כדורסל. חומר: כדור הארץ מקיף את השמש."},
+        json={"prompt": "I love basketball. Material: The Earth orbits the Sun."},
     )
     first_id = first.headers["X-Agent-Session-Id"]
-    second = client.post("/api/execute", json={"prompt": "בחן אותי"})
+    second = client.post("/api/execute", json={"prompt": "Quiz me"})
     assert second.headers["X-Agent-Session-Id"] == first_id
     assert second.headers["X-LLM-Calls-Used"] == "4"
 
@@ -83,19 +83,19 @@ def test_session_is_continuous_and_reset_creates_a_new_id(client) -> None:
     assert reset.status_code == 200
     assert reset.json() == {"status": "ok"}
 
-    third = client.post("/api/execute", json={"prompt": "חומר חדש: הירח קטן מכדור הארץ."})
+    third = client.post("/api/execute", json={"prompt": "New material: The moon is smaller than the Earth."})
     assert third.headers["X-Agent-Session-Id"] != first_id
     assert third.headers["X-LLM-Calls-Used"] == "2"
 
 
 def test_hard_call_limit_never_invokes_another_model_call(client) -> None:
-    first = client.post("/api/execute", json={"prompt": "חומר לימוד קצר"})
+    first = client.post("/api/execute", json={"prompt": "Short study material"})
     session_id = first.headers["X-Agent-Session-Id"]
     state = session_store.get(session_id)
     state.llm_calls = MAX_LLM_CALLS
     session_store.save(state)
 
-    limited = client.post("/api/execute", json={"prompt": "המשך"})
+    limited = client.post("/api/execute", json={"prompt": "Continue"})
     assert limited.status_code == 200
     assert limited.json()["steps"] == []
     assert "16" in limited.json()["response"]

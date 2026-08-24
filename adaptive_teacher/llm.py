@@ -152,14 +152,14 @@ def _mock_llm(messages: list[LlmMessage]) -> dict[str, Any]:
                 "action": "Stop",
                 "reason": "The session has no remaining call for another tool.",
                 "tool_instruction": "",
-                "direct_response": "הגענו לסוף תקציב הקריאות בשיחה הזו. אפשר לפתוח שיחה חדשה כדי להמשיך.",
+                "direct_response": "We have reached the end of the API call budget for this session. You can start a new session to continue.",
             }
-        if any(word in lowered for word in ("stop", "סיום", "עצור", "להפסיק")):
+        if any(word in lowered for word in ("stop", "end", "halt", "finish")):
             return {
                 "action": "Stop",
                 "reason": "The student asked to end the learning session.",
                 "tool_instruction": "",
-                "direct_response": "סיימנו להיום. אפשר לפתוח שיחה חדשה בכל זמן.",
+                "direct_response": "We are done for today. You can open a new session anytime.",
             }
         if not str(state.get("material") or "").strip():
             action = "AnalyzeMaterial"
@@ -167,9 +167,9 @@ def _mock_llm(messages: list[LlmMessage]) -> dict[str, Any]:
             action = "AnswerEvaluator"
         elif not state.get("interests"):
             action = "AskInterests"
-        elif any(word in lowered for word in ("story", "סיפור")):
+        elif any(word in lowered for word in ("story", "tale")):
             action = "StoryTool"
-        elif any(word in lowered for word in ("explain", "summary", "הסבר", "סכם")):
+        elif any(word in lowered for word in ("explain", "summary", "summarize", "describe")):
             action = "ExplainMaterial"
         else:
             action = "QuestionTool"
@@ -185,34 +185,34 @@ def _mock_llm(messages: list[LlmMessage]) -> dict[str, Any]:
         if student_message.strip() and len(student_message.strip()) < 300:
             interests = [student_message.strip()[:120]]
         return {
-            "response": "כדי להתאים את הלמידה אליך, ספר לי על שניים או שלושה דברים שמעניינים אותך—למשל ספורט, מוזיקה, משחקים או טכנולוגיה.",
+            "response": "To tailor the learning to you, tell me about two or three things that interest you—for example sports, music, gaming, or technology.",
             "interests": interests,
         }
     if "AnalyzeMaterial" in system:
-        interests = ["כדורסל"] if "כדורסל" in student_message else []
+        interests = ["basketball"] if "basketball" in student_message else []
         return {
-            "response": "קיבלתי את חומר הלימוד ושמרתי אותו להמשך השיחה. במצב הדמו זיהיתי את הרעיונות המרכזיים. כעת אפשר לבקש הסבר או להתחיל בתרגול.",
+            "response": "I received the study material and saved it for the rest of the conversation. In demo mode I identified the main ideas. Now you can ask for an explanation or start practicing.",
             "material": student_message[:30_000],
             "interests": interests,
-            "topics": ["הנושא המרכזי", "מושגי מפתח"],
+            "topics": ["Main topic", "Key concepts"],
         }
     if "ExplainMaterial" in system:
         return {
-            "response": "הנה הסבר קצר המבוסס על החומר שסיפקת: נתחיל ברעיון המרכזי, נחבר אליו את מושגי המפתח, ואז נבדוק את ההבנה בדוגמה.",
+            "response": "Here is a brief explanation based on the material you provided: let's start with the main idea, connect it to the key concepts, and then check understanding with an example.",
         }
     if "StoryTool" in system:
         return {
-            "response": "בוא נלמד דרך סיפור קצר שמחבר את הרעיון המרכזי לתחומי העניין שלך. כל פרט בסיפור מייצג מושג מתוך החומר שסיפקת.",
+            "response": "Let's learn through a short story that connects the main idea to your interests. Every detail in the story represents a concept from the material you provided.",
         }
     if "QuestionTool" in system:
-        question = "מהו הרעיון המרכזי של החומר במילים שלך?"
-        return {"response": f"נתחיל בשאלה קצרה: {question}", "questions": [question]}
+        question = "What is the main idea of the material in your own words?"
+        return {"response": f"Let's start with a short question: {question}", "questions": [question]}
     if "AnswerEvaluator" in system:
         return {
-            "response": "תשובה טובה. זיהית את הכיוון המרכזי, אבל כדאי לדייק במושגי המפתח. נסה לתת דוגמה אחת מתוך החומר.",
+            "response": "Good answer. You identified the main direction, but you should be more precise with the key concepts. Try to give one example from the material.",
             "score": 75,
-            "weak_topics": ["מושגי מפתח"],
-            "strong_topics": ["הרעיון המרכזי"],
+            "weak_topics": ["Key concepts"],
+            "strong_topics": ["Main idea"],
             "mastery": False,
         }
-    return {"response": "אני מוכן להמשיך ללמד בהתאם לחומר שסיפקת."}
+    return {"response": "I am ready to continue teaching based on the material you provided."}

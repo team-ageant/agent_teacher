@@ -7,8 +7,8 @@ from typing import Any
 from .config import get_settings
 
 EXAMPLE_PROMPT = (
-    "אני אוהב כדורסל. הנה חומר הלימוד: פוטוסינתזה היא התהליך שבו "
-    "צמחים משתמשים באור כדי להמיר מים ופחמן דו-חמצני לגלוקוז וחמצן."
+    "I love basketball. Here is the study material: Photosynthesis is the process by which "
+    "plants use light to convert water and carbon dioxide into glucose and oxygen."
 )
 
 
@@ -27,11 +27,11 @@ def team_info() -> dict[str, Any]:
 
 def agent_info() -> dict[str, Any]:
     full_response = (
-        "קיבלתי את החומר. כדי לחבר את הפוטוסינתזה לכדורסל, דמיין "
-        "שהעלה הוא המגרש: אור השמש מספק את האנרגיה, מים ופחמן דו-חמצני "
-        "הם השחקנים שנכנסים למהלך, והגלוקוז הוא הנקודות שהצמח מייצר. "
-        "החמצן משתחרר כתוצר נוסף. עכשיו שאלה קצרה: אילו שני חומרים "
-        "נכנסים לתהליך?"
+        "I received the material. To connect photosynthesis to basketball, imagine "
+        "the leaf is the court: sunlight provides the energy, water and carbon dioxide "
+        "are the players entering the play, and glucose is the points the plant scores. "
+        "Oxygen is released as a byproduct. Now a quick question: which two substances "
+        "enter the process?"
     )
     return {
         "description": (
@@ -84,9 +84,9 @@ def agent_info() -> dict[str, Any]:
                         },
                         "response": {
                             "response": full_response,
-                            "interests": ["כדורסל"],
-                            "topics": ["פוטוסינתזה"],
-                            "questions": ["אילו שני חומרים נכנסים לתהליך?"],
+                            "interests": ["basketball"],
+                            "topics": ["photosynthesis"],
+                            "questions": ["Which two substances enter the process?"],
                         },
                     },
                 ],

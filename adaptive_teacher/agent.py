@@ -72,7 +72,7 @@ async def execute_agent(state: LearningState, message: str) -> tuple[str, list[d
     steps: list[TraceStep] = []
     if state.llm_calls >= MAX_LLM_CALLS:
         response = (
-            "הגענו למגבלה של 16 קריאות למודל בשיחה הזו. אפשר להתחיל session חדש כדי להמשיך ללמוד."
+            "We reached the limit of 16 model calls in this session. You can start a new session to continue learning."
         )
         state.history.extend(
             [
@@ -112,7 +112,7 @@ async def execute_agent(state: LearningState, message: str) -> tuple[str, list[d
     if decision.action not in {"RespondDirectly", "Stop"}:
         if state.llm_calls >= MAX_LLM_CALLS:
             response = (
-                "הגעתי למגבלת הקריאות לפני הפעלת הכלי הבא. פתח session חדש כדי להמשיך עם תקציב מלא."
+                "I reached the call limit before running the next tool. Open a new session to continue with a full budget."
             )
             state.last_action = "Stop"
         else:
@@ -143,13 +143,13 @@ async def execute_agent(state: LearningState, message: str) -> tuple[str, list[d
             response = (
                 tool_response
                 if isinstance(tool_response, str)
-                else "הפעולה הושלמה, אך לא התקבלה תשובה להצגה."
+                else "The action was completed, but no response was returned to display."
             )
     else:
         state.last_action = decision.action
         if not response:
             response = (
-                "סיימנו את תהליך הלמידה להיום." if decision.action == "Stop" else "אני מוכן להמשיך."
+                "We finished the learning process for today." if decision.action == "Stop" else "I am ready to continue."
             )
 
     state.history.append(ChatTurn(role="teacher", content=response))
