@@ -18,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
 MAX_QUERY_CHARS = 4_000
 MAX_PASSAGE_CHARS = 3_000
 
-
+ 
 def _as_dict(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
         return value
