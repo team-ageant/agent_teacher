@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
-
+ 
 from adaptive_teacher.agent import execute_agent
 from adaptive_teacher.api_info import agent_info, team_info
 from adaptive_teacher.config import get_settings
