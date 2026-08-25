@@ -21,7 +21,7 @@ def _compact_state(state: LearningState) -> dict[str, object]:
         "recent_history": [turn.as_dict() for turn in state.history[-8:]],
     }
 
-
+ 
 def _json(value: object) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
