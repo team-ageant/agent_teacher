@@ -10,7 +10,7 @@ const state = {
   openTrace: null,
   requestController: null,
 };
-
+ 
 const elements = {
   composer: document.querySelector("#composer"),
   prompt: document.querySelector("#prompt"),
