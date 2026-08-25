@@ -16,7 +16,7 @@ TOOL_NAMES = (
     "RespondDirectly",
     "Stop",
 )
-
+ 
 ToolName = Literal[
     "AskInterests",
     "AnalyzeMaterial",
