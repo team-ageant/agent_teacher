@@ -17,7 +17,7 @@ from .models import (
 from .prompts import supervisor_prompt, tool_prompt
 from .retrieval import retrieve_passages
 
-
+ 
 def _string_array(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
