@@ -1,5 +1,5 @@
          Course Project 
-         Goal 
+         Goal  
          Design, develop and deploy an innovative AI agent that autonomously solves 
          a well-deï¬ned niche problem, leveraging state-of-the-art AI models with 
          strong reasoning capabilities and appropriate AI agent architectures. 
@@ -258,7 +258,7 @@
         implications and potential applications across various areas of life. Consider what 
         new possibilities can be unlocked by harnessing these cutting-edge tools to solve 
         real-world problems and enhance our daily experiences. Never it was possible to 
-        develop a fully autonomous agent so fast and with such quality - Itâ€™s pretty cool í ½í¸Š   
+        develop a fully autonomous agent so fast and with such quality - Itâ€™s pretty cool ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   
          
         Good luck!  
         Idan Hahn 
