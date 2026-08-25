@@ -6,7 +6,7 @@ The application now uses FastAPI for the server, agent, session memory, APIs, an
 
 ## Current status
 
-Implemented:
+Implemented: 
 
 - responsive chat interface with a complete execution trace;
 - dynamic supervisor and eight consistently named actions;
