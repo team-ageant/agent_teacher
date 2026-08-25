@@ -11,7 +11,7 @@ EXAMPLE_PROMPT = (
     "plants use light to convert water and carbon dioxide into glucose and oxygen."
 )
 
-
+ 
 def team_info() -> dict[str, Any]:
     settings = get_settings()
     return {
