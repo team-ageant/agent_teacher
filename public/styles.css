@@ -9,7 +9,7 @@
   --coral: #ff6b4a;
   --blue: #2d5bff;
 }
-
+ 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
