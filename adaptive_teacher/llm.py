@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 LlmMessage = dict[str, str]
 
-
+ 
 def _extract_json(text: str) -> dict[str, Any]:
     cleaned = re.sub(r"^```(?:json)?\s*", "", text.strip(), flags=re.IGNORECASE)
     cleaned = re.sub(r"\s*```$", "", cleaned)
