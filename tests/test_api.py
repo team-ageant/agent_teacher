@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from adaptive_teacher.models import MAX_LLM_CALLS
 from adaptive_teacher.state import session_store
-
+ 
 
 def test_root_serves_framework_free_interface(client) -> None:
     response = client.get("/")
