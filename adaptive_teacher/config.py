@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from dotenv import load_dotenv
-
+ 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Load standard .env file followed by .env.local for local overrides.
